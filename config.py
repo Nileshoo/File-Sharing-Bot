@@ -10,11 +10,16 @@ load_dotenv()
 #Bot token @Botfather
 TG_BOT_TOKEN = os.environ.get("TG_BOT_TOKEN", "")
 
-#Your API ID from my.telegram.org
-API_ID = int(os.environ.get("API_ID", ""))
+#Your API ID from my.telegram.org. Support APP_ID as fallback for old deployments.
+API_ID_ENV = os.environ.get("API_ID") or os.environ.get("APP_ID")
+if not API_ID_ENV:
+    raise Exception("Missing API_ID (or APP_ID). Please set API_ID environment variable from my.telegram.org.")
+API_ID = int(API_ID_ENV)
 
 #Your API Hash from my.telegram.org
 API_HASH = os.environ.get("API_HASH", "")
+if not API_HASH:
+    raise Exception("Missing API_HASH. Please set API_HASH environment variable from my.telegram.org.")
 
 #Your db channel Id
 CHANNEL_ID = int(os.environ.get("CHANNEL_ID", ""))
@@ -41,9 +46,10 @@ START_MSG = os.environ.get("START_MESSAGE", "Hello {first}\n\nI can store privat
 try:
     ADMINS=[]
     for x in (os.environ.get("ADMINS", "").split()):
-        ADMINS.append(int(x))
+        if x:
+            ADMINS.append(int(x))
 except ValueError:
-        raise Exception("Your Admins list does not contain valid integers.")
+    raise Exception("Your Admins list does not contain valid integers.")
 
 #Force sub message 
 FORCE_MSG = os.environ.get("FORCE_SUB_MESSAGE", "Hello {first}\n\n<b>You need to join in my Channel/Group to use me\n\nKindly Please join Channel</b>")
